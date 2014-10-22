@@ -1,0 +1,15 @@
+Práctica 2
+
+AUTOR: Marcos López Lorenzo
+
+Objetivo:
+    Diseñar un autómata implementado con el método del autómata programado para reconocer números decimales positivos o negativos: 25 -25 +25 25.25 +25.25 -25.25, o número hexadecimales en formato 0x1ab2
+
+Desarrollo:
+    He diseñado un autómata de 11 estados que reconoce las cadenas requeridas. Luego he programado el autómata para crear un programa para reconocer dichas cadenas.
+
+Compilación y prueba:
+    Para compilar basta con ejecutar `make` o manualmente `gcc -o practica2 practica2.c`
+
+    Para comprobar el funcionamiento, ejemplos prediseñados se pueden ejecutar con `make run`, o también se puede utilizar el programa ya compilado, seguido de las cadenas que se quieren parsear, terminadas por un '$', ej: ./practica2 123.123$
+

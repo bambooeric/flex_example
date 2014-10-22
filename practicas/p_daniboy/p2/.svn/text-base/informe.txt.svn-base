@@ -1,0 +1,17 @@
+Formato de consulta
+	SELECT *|campo1[,campo2,…] FROM Nombre_Tabla 
+		WHERE operando operador operando; 
+
+	Las palabras reservadas select, from y where puden ir en minúsculas 
+o en mayúsuculas. En Nombre_Tabla solo se permite el nombre empleados
+que es la tabla que se permite. En la comparación del where se permite 
+comparar un número real con un entero, pero no se permite comparar un 
+campo de tipo real con un entero. Solo se permiten un límite de 
+empleados establecido en la constante NEMP.
+	En cuanto se detecta un error se aborta la ejecucion del programa
+, solo se contempla un error. Errores que se contemplan:
+	- Consulta mal formada
+	- Tabla incorrecta
+	- campo en el select o en alguno de los operandos no reconocido
+	- Operador en parte where desconocido
+	- Tipos de datos incompatibles

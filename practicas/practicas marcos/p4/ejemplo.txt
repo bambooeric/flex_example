@@ -1,0 +1,6 @@
+Nombre de la asignatura - Curso 2011/2012 
+DNI Apellido1 Apellido2, Nombre Grupo Nota1 Nota2 
+11345678-X Alonso Barreiro, Antonio 1A 5.68 4.8 
+AAAAAAAA-X Alonso Barros, Antonio 1A 5.68 4.8 
+12345678-X Alonso Calvo, Andrés 1B 8.8 10.00 
+13345678-X Barreiro Calvo, Luis 2A 35.68 4.8

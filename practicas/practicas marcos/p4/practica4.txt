@@ -1,0 +1,8 @@
+Práctica 4
+
+Autor: Marcos López Lorenzo
+
+Objetivo:
+    Crear un parser en lex/flex para analizar un fichero de calificaciones de alumnos de asignaturas y convertirlo a un formato simplificado.
+
+    Para ejecutar esta práctica es suficiente con ejecutar `make run` y el programa será compilado y ejecutado sobre el fichero "ejemplo.txt"
