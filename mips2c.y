@@ -27,32 +27,32 @@ codigo : text data 						{printf("HOLA!\n");}
 ;
 data : DATA EOL definiciones 			{printf("HOLA!\n");}
 ;
-definiciones : definicion EOL			{printf("HOLA!\n");} 
-	| definicion EOL definiciones 		{printf("HOLA!\n");}
+definiciones : definicion 				{printf("HOLA!\n");} 
+	| definicion definiciones 			{printf("HOLA!\n");}
 ;
-definicion : ETIQ PP TIPO valores 		{printf("HOLA!\n");}
+definicion : ETIQ PP TIPO valores EOL 	{printf("HOLA!\n");}
 ;
 valores : VALOR 						{printf("HOLA!\n");}
-	| VALOR C valores 				{printf("HOLA!\n");}
+	| VALOR C valores 					{printf("HOLA!\n");}
 ;
 text : TEXT EOL globl    				{printf("HOLA!\n");}
 ;
-globl : GLOBL ETIQ EOL bloques 		{printf("HOLA!\n");}
+globl : GLOBL ETIQ EOL bloques 			{printf("HOLA!\n");}
 ;
 bloques : bloque 						{printf("HOLA!\n");} 
 	| bloque bloques  					{printf("HOLA!\n");}
 ;
 bloque : ETIQ PP EOL instrucciones  	{printf("HOLA!\n");}
 ;
-instrucciones : instruccion EOL		{printf("HOLA!\n");} 
-	| instruccion EOL instrucciones 	{printf("HOLA!\n");}
+instrucciones : instruccion				{printf("HOLA!\n");} 
+	| instruccion instrucciones 		{printf("HOLA!\n");}
 ;
-instruccion : OP operadores  			{printf("HOLA!\n");}
+instruccion : OP operadores EOL 		{printf("HOLA!\n");}
 ;
-operadores : OPR C OPR C OPR 		{printf("HOLA!\n");} 
-	| OPR C OPR C VALOR 			{printf("HOLA!\n");} 
+operadores : OPR C OPR C OPR 			{printf("HOLA!\n");} 
+	| OPR C OPR C VALOR 				{printf("HOLA!\n");} 
 	| OPR C DESPL '(' OPR ')'			{printf("HOLA!\n");} 
-	| OPR C OPR C ETIQ	 			{printf("HOLA!\n");} 
+	| OPR C OPR C ETIQ	 				{printf("HOLA!\n");} 
 	| ETIQ 								{printf("HOLA!\n");} 
 ;
 %%
