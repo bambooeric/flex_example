@@ -1,8 +1,0 @@
-Práctica 3
-
-Autor: Marcos López Lorenzo
-
-Objetivo:
-    Crear un parser en flex para contar caracteres, palabras y líneas (no incluidas las de comentario) en un archivo en código fuente c.
-
-    Para ejecutar esta práctica es suficiente con ejecutar `make run` y el programa será compilado y ejecutado sobre el fichero "ejemplo.c"

@@ -1,8 +1,0 @@
-Práctica 5
-
-Autor: Marcos López Lorenzo
-
-Objetivo:
-    Crear un parser en lex/flex que analize un archivo de bibliografía en formato xml y lo convierta a un archivo estandar bibtex.
-
-    Para ejecutar esta práctica es suficiente con ejecutar `make run` y el programa será compilado y ejecutado sobre el fichero "ejemplo.xml"

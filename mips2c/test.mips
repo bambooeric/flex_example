@@ -1,0 +1,7 @@
+.text
+.globl main
+main:
+addi $a3, $0, 5
+
+.data
+a: .int 1,2,3,4

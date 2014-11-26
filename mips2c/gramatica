@@ -1,0 +1,24 @@
+GRAMATICA PARA DESCOMPILADOR DE C A MIPS
+
+S : codigo
+
+codigo : text | globl | data
+
+text : .TEXT 									???
+
+data : .DATA definiciones
+definiciones : definicion | definicion definiciones
+definicion : NOMBRE ":" TIPO valores
+valores : VALOR | VALOR "," valores
+
+globl : .GLOBL BLOQUE_INITIAL bloques
+bloques : bloque | bloque bloques
+bloque : ETIQUETA ":" instrucciones
+instrucciones : instruccion | instruccion instrucciones
+intstruccion : OPERACION operadores
+operadores : OP1 OP2 OP3 | OP1 DESPL OP2 | OP1 OP2 ETIQUETA | ETIQUETA
+
+
+NOTAS:
+como hago para soportar los saltos a registros y las subrutinas?
+puedo hacerlo sin soportar la pila de registros de retorno $ra?
