@@ -18,9 +18,9 @@ WORD {ALPHA}*
 ".text"					  {printf("text<%s>",yytext);return TEXT;}
 ".data"					  {printf("data<%s>",yytext);return GLOBL;}
 
-{ALPHA}+({ALPHA}{DIGIT})* {printf("etiq<%s>",yytext);return ETIQ;}
+{ALPHA}({ALPHA}|{DIGIT})*  {printf("etiq<%s>",yytext);return ETIQ;}
 "$"{ALPHA}?{DIGIT}*		  {printf("opr<%s>",yytext);return OPR;}
-{DIGIT}*				  {printf("despl<%s>",yytext);return DESPL;}
+{DIGIT}+				  {printf("despl<%s>",yytext);return DESPL;}
 "."("float"|"int")		  {printf("tipo<%s>",yytext);return TIPO;}
 -?{DIGIT}+("."{DIGIT}+)?  {printf("valor<%s>",yytext);return VALOR;}
 .						  {printf("wat<%s>",yytext);}
