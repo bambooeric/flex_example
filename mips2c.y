@@ -4,6 +4,14 @@
 #include<stdio.h>
 #include<string.h>
 
+struct Instruccion{
+	char* tipo;
+	char* codigo;
+	char* arg1;
+	char* arg2;
+	char* arg3;
+};
+int nInstrucciones = 0;
 
 void yyerror (char const * );
 
@@ -51,7 +59,7 @@ instrucciones : instruccion				{printf("-- instruccion detectada\n");}
 instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");}
 	| SYSCALL EOL 						{printf("-- syscall invocado\n");}
 ;
-operadores : OPR C OPR C OPR 			{printf("-- instruccion normal\n");} 
+operadores : OPR C OPR C OPR 			{printf("-- instruccion normal %s %s %s\n",$1,$3,$5);} 
 	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");} 
 	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");} 
 	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");} 
