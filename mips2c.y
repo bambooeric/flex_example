@@ -12,7 +12,7 @@ void yyerror (char const * );
 %union{
 	char* valString;
 }
-%token DATA TEXT GLOBL PP C EOL P1 P2
+%token DATA TEXT GLOBL SYSCALL PP C EOL P1 P2
 %token<valString> ETIQ OPR TIPO VALOR 
 %type<valString> codigo text data definiciones definicion valores globl bloques bloque instrucciones instruccion operadores
 %start S
@@ -21,10 +21,10 @@ void yyerror (char const * );
 
 S : codigo 								{printf("CODIGO ACEPTADO!!!!!!!\n");}
 ;
-codigo : text data 						{printf("HOLA!\n");} 
-	| data text							{printf("HOLA!\n");}
-	| data								{printf("HOLA!\n");}
-	| text								{printf("HOLA!\n");}
+codigo : text data 						{} 
+	| data text							{}
+	| data								{}
+	| text								{}
 ;
 data : DATA EOL definiciones 			{printf("-- seccion data\n");}
 ;
@@ -49,12 +49,14 @@ instrucciones : instruccion				{printf("-- instruccion detectada\n");}
 	| instruccion instrucciones 		{printf("-- quedan mas instrucciones\n");}
 ;
 instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");}
+	| SYSCALL EOL 						{printf("-- syscall invocado\n");}
 ;
 operadores : OPR C OPR C OPR 			{printf("-- instruccion normal\n");} 
 	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");} 
-	| OPR C VALOR '(' OPR ')'			{printf("-- instruccion con desplazamiento\n");} 
+	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");} 
 	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");} 
 	| ETIQ 								{printf("-- instruccion salto\n");} 
+	| OPR C ETIQ						{printf("-- instruccion la\n");} 
 ;
 %%
 int main(int argc, char** argv){
