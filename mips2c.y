@@ -4,14 +4,32 @@
 #include<stdio.h>
 #include<string.h>
 
+#define MAX_INSTRUCCIONES 100
+#define MAX_DATA_SIZE 100
+#define MAX_DATA_VARS 100
+
 struct Instruccion{
-	char* tipo;
 	char* codigo;
 	char* arg1;
 	char* arg2;
 	char* arg3;
 };
+
+struct DataVector{
+	char* nombre;
+	char* tipo;
+	char* valor[MAX_DATA_SIZE];
+	/* Debería inicializarse recorriendo la estructura, pero 
+	 * los enteros creados en el programa principal como variable 
+	 * global siempre son 0 si no se inicializan*/
+	int nValores;
+};
+
+struct Instruccion instrucciones[MAX_INSTRUCCIONES];
+struct DataVector vectores[MAX_DATA_VARS];
+
 int nInstrucciones = 0;
+int nVectores = 0;
 
 void yyerror (char const * );
 
@@ -39,10 +57,22 @@ data : DATA EOL definiciones 			{printf("-- seccion data\n");}
 definiciones : definicion 				{printf("-- definicion detectada\n");} 
 	| definicion definiciones 			{printf("-- queda mas definiciones\n");}
 ;
-definicion : ETIQ PP TIPO valores EOL 	{printf("-- definicion\n");}
+definicion : ETIQ PP TIPO valores EOL 	{printf("-- definicion\n");
+		   									vectores[nVectores].nombre = strdup($1);
+		   									vectores[nVectores].tipo = strdup($3);
+											nVectores++;
+		   								}
 ;
-valores : VALOR 						{}
-	| VALOR C valores 					{}
+valores : VALOR 						{
+											int nValores = vectores[nVectores].nValores;
+											vectores[nVectores].valor[nValores] = strdup($1);
+											vectores[nVectores].nValores++;
+										}
+	| VALOR C valores 					{
+											int nValores = vectores[nVectores].nValores;
+											vectores[nVectores].valor[nValores] = strdup($1);
+											vectores[nVectores].nValores++;
+										}
 ;
 text : TEXT EOL globl    				{printf("-- seccion text\n");}
 ;
@@ -56,22 +86,58 @@ bloque : ETIQ PP EOL instrucciones  	{printf("-- bloque de instrucciones\n");}
 instrucciones : instruccion				{printf("-- instruccion detectada\n");} 
 	| instruccion instrucciones 		{printf("-- quedan mas instrucciones\n");}
 ;
-instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");}
-	| SYSCALL EOL 						{printf("-- syscall invocado\n");}
+instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
+		   									instrucciones[nInstrucciones].codigo = strdup($1); 
+											nInstrucciones++;
+										}
+	| SYSCALL EOL 						{printf("-- syscall invocado\n");
+		   									instrucciones[nInstrucciones].codigo = strdup("SYSCALL"); 
+											nInstrucciones++;
+										}
 ;
-operadores : OPR C OPR C OPR 			{printf("-- instruccion normal %s %s %s\n",$1,$3,$5);} 
-	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");} 
-	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");} 
-	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");} 
-	| ETIQ 								{printf("-- instruccion salto\n");} 
-	| OPR C ETIQ						{printf("-- instruccion la\n");} 
+operadores : OPR C OPR C OPR 			{printf("-- instruccion normal %s %s %s\n",$1,$3,$5);
+		   									instrucciones[nInstrucciones].arg1 = strdup($1); 
+		   									instrucciones[nInstrucciones].arg2 = strdup($3); 
+		   									instrucciones[nInstrucciones].arg3 = strdup($5); 
+										} 		   
+	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");
+		   									instrucciones[nInstrucciones].arg1 = strdup($1); 
+		   									instrucciones[nInstrucciones].arg2 = strdup($3); 
+		   									instrucciones[nInstrucciones].arg3 = strdup($5);
+										} 
+	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");
+		   									instrucciones[nInstrucciones].arg1 = strdup($1); 
+		   									instrucciones[nInstrucciones].arg2 = strdup($3); 
+		   									instrucciones[nInstrucciones].arg3 = strdup($5);
+										} 
+	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");
+		   									instrucciones[nInstrucciones].arg1 = strdup($1); 
+		   									instrucciones[nInstrucciones].arg2 = strdup($3); 
+		   									instrucciones[nInstrucciones].arg3 = strdup($5);
+										} 
+	| ETIQ 								{printf("-- instruccion salto\n");
+			   								instrucciones[nInstrucciones].arg1 = strdup($1); 
+										} 
+	| OPR C ETIQ						{printf("-- instruccion la\n");
+		   									instrucciones[nInstrucciones].arg1 = strdup($1);
+		   									instrucciones[nInstrucciones].arg2 = strdup($3);
+										} 
 ;
 %%
 int main(int argc, char** argv){
-	struct Instruccion ** instrucciones = NULL;
-	nInstrucciones = 0;
-
+	
 	yyparse();
+
+	int i;
+	for(i=0;i<nInstrucciones;i++)
+		printf("<%s>\n",instrucciones[i].codigo);
+	
+	for(i=0;i<nVectores;i++){
+		printf("<%s>: ",vectores[i].nombre);
+		int z;
+		for(z=0;z<vectores[i].nValores;z++)
+			printf("|%s|",vectores[i].valor[z]);
+	}
 }
 void yyerror (char const *message) {
 	fprintf(stderr, "%s\n",message);
