@@ -124,7 +124,7 @@ instrucciones : instruccion				{printf("-- instruccion detectada\n");
 										}
 ;
 instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
-											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion*));
+											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion));
 											instruccion->codigo = strdup($1);
 
 											if($2->args[0]!=NULL) instruccion->args[0] = strdup($2->args[0]);
@@ -134,7 +134,7 @@ instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
 											$$ = instruccion;
 										}
 	| SYSCALL EOL 						{printf("-- syscall invocado\n");
-											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion*));
+											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion));
 											instruccion->codigo = strdup("SYSCALL");
 
 											instruccion->args[0] = NULL;
@@ -145,7 +145,7 @@ instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
 										}
 ;
 operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
-		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
@@ -154,7 +154,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 											$$ = args;
 										} 		   
 	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");
-											struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+											struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
@@ -163,7 +163,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 											$$ = args;
 										} 
 	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");
-		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
@@ -172,7 +172,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 											$$ = args;
 										} 
 	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");
-		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
@@ -181,7 +181,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 											$$ = args;
 										} 
 	| ETIQ 								{printf("-- instruccion salto\n");
-		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = NULL;
@@ -190,7 +190,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 											$$ = args;
 										} 
 	| OPR C ETIQ						{printf("-- instruccion la\n");
-		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
