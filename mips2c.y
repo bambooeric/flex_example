@@ -203,23 +203,19 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 int main(int argc, char** argv){
 	
 	yyparse();
-/*
-	int i;
-	for(i=0;i<nInstrucciones;i++)
-		printf("<%s>\n",instrucciones[i].codigo);
-	
-	for(i=0;i<nVectores;i++){
-		printf("<%s>: ",vectores[i].nombre);
-		int z;
-		for(z=0;z<vectores[i].nValores;z++)
-			printf("|%s|",vectores[i].valor[z]);
-	}
-*/
-printf("%s\n",bloques[0]->etiqueta);
-printf("%d\n",bloques[0]->nInstrucciones);
-int x;
-for(x=0;x<bloques[0]->nInstrucciones;x++)
-	printf("%s %s\n",bloques[0]->instrucciones[x]->codigo, bloques[0]->instrucciones[x]->args[0]);
+    int i,j,k;
+    for (i=nBloques-1; i>=0; --i) {
+        printf("%s\n",bloques[i]->etiqueta);
+        printf("%d\n",bloques[i]->nInstrucciones);
+        for (j=bloques[i]->nInstrucciones-1;j>=0;--j) {
+            printf("%s ",bloques[i]->instrucciones[j]->codigo);
+            k = 0;
+            while (k < 3 && bloques[i]->instrucciones[j]->args[k] != NULL) {
+                printf("%s ", bloques[i]->instrucciones[j]->args[k++]);
+            }
+            printf("\n");
+        }
+    }
 }
 void yyerror (char const *message) {
 	fprintf(stderr, "%s\n",message);
