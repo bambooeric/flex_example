@@ -18,15 +18,15 @@ WORD {ALPHA}*
 "("						  {/*printf("<(>");*/return P1;}
 ")"						  {/*printf("<)>");*/return P2;}
 
-".globl"				  {/*printf("globl<%s>",yytext);*/return GLOBL;}
-".text"					  {/*printf("text<%s>",yytext);*/return TEXT;}
-".data"					  {/*printf("data<%s>",yytext);*/return DATA;}
-"syscall" 				  {/*printf("<syscall>");*/return SYSCALL;}
+".globl"				  {/*printf("globl<%s>",yytext);*/yylval.valString = strdup(yytext);return GLOBL;}
+".text"					  {/*printf("text<%s>",yytext);*/yylval.valString = strdup(yytext);return TEXT;}
+".data"					  {/*printf("data<%s>",yytext);*/yylval.valString = strdup(yytext);return DATA;}
+"syscall" 				  {/*printf("<syscall>");*/yylval.valString = strdup(yytext);return SYSCALL;}
 
-{ALPHA}({ALPHA}|{DIGIT})* {/*printf("etiq<%s>",yytext);*/return ETIQ;}
-"$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/return OPR;}
-"."("float"|"int")		  {/*printf("tipo<%s>",yytext);*/return TIPO;}
--?{DIGIT}+("."{DIGIT}+)?  {/*printf("valor<%s>",yytext);*/return VALOR;}
+{ALPHA}({ALPHA}|{DIGIT})* {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQ;}
+"$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/yylval.valString = strdup(yytext);return OPR;}
+"."("float"|"int")		  {/*printf("tipo<%s>",yytext);*/yylval.valString = strdup(yytext);return TIPO;}
+-?{DIGIT}+("."{DIGIT}+)?  {/*printf("valor<%s>",yytext);*/yylval.valString = strdup(yytext);return VALOR;}
 
 %%
 /*

@@ -68,6 +68,9 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal %s %s %s\n",$1,$3
 ;
 %%
 int main(int argc, char** argv){
+	struct Instruccion ** instrucciones = NULL;
+	nInstrucciones = 0;
+
 	yyparse();
 }
 void yyerror (char const *message) {
