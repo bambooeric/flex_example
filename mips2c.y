@@ -102,6 +102,7 @@ bloques : bloque 						{printf("-- bloque detectado\n");}
 bloque : ETIQ PP EOL instrucciones  	{printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque*));
 											bloque->etiqueta = strdup($1);
+
 											int i;
 											for(i=0;i<nInstrucciones;i++)
 												bloque->instrucciones[i] = INST[i];
@@ -145,50 +146,57 @@ instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
 ;
 operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
+
 											$$ = args;
 										} 		   
 	| OPR C OPR C VALOR 				{printf("-- instruccion i\n");
 											struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
-											$$ = args;
 
+											$$ = args;
 										} 
 	| OPR C VALOR P1 OPR P2				{printf("-- instruccion con desplazamiento\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
-											$$ = args;
 
+											$$ = args;
 										} 
 	| OPR C OPR C ETIQ	 				{printf("-- instruccion salto cond\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
-											$$ = args;
 
+											$$ = args;
 										} 
 	| ETIQ 								{printf("-- instruccion salto\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = NULL;
 											args->args[2] = NULL;
-											$$ = args;
 
+											$$ = args;
 										} 
 	| OPR C ETIQ						{printf("-- instruccion la\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args*));
+
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = NULL;
-											$$ = args;
 
+											$$ = args;
 										} 
 ;
 %%
@@ -207,10 +215,11 @@ int main(int argc, char** argv){
 			printf("|%s|",vectores[i].valor[z]);
 	}
 */
+printf("%s\n",bloques[0]->etiqueta);
 printf("%d\n",bloques[0]->nInstrucciones);
 int x;
 for(x=0;x<bloques[0]->nInstrucciones;x++)
-	printf("%s\n",bloques[0]->instrucciones[x]->codigo);
+	printf("%s %s\n",bloques[0]->instrucciones[x]->codigo, bloques[0]->instrucciones[x]->args[0]);
 }
 void yyerror (char const *message) {
 	fprintf(stderr, "%s\n",message);

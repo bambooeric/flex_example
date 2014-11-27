@@ -2,18 +2,11 @@
 .globl main
 main:
 
-#cargamos la direccion de memoria de a en a0
 la $a0, a 
 
-#vamos cargando el valor de la posicion desplazada de a en a2
-#y sumamos el valor en a1
 lw $a2, 0($a0)
 add $a1, $0, $a2
 
-lw $a2, 4($a0)
-add $a1, $0, $a2
-
-#syscall 1 = print integer de lo que hay en a0
 add $a0, $0, $a1
 addi $v0, $0, 1
 syscall
