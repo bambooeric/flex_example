@@ -100,7 +100,7 @@ bloques : bloque 						{printf("-- bloque detectado\n");}
 	| bloque bloques  					{printf("-- quedan mas bloques\n");}
 ;
 bloque : ETIQ PP EOL instrucciones  	{printf("-- bloque de instrucciones\n");
-	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque*));
+	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
 											bloque->etiqueta = strdup($1);
 
 											int i;
