@@ -1,7 +1,7 @@
 .text
 .globl main
 main:
-addi $a3, $0, 5
+addi $a3, $0, 5	#un comentario
 
 .data
 a: .int 1,2,3,4
