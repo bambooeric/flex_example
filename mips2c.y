@@ -216,6 +216,8 @@ int main(int argc, char** argv){
             printf("\n");
         }
     }
+
+    return 0;
 }
 void yyerror (char const *message) {
 	fprintf(stderr, "%s\n",message);
