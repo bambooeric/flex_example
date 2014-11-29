@@ -203,6 +203,7 @@ operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 int main(int argc, char** argv){
 	
 	yyparse();
+
     int i,j,k;
     for (i=nBloques-1; i>=0; --i) {
         printf("%s\n",bloques[i]->etiqueta);
@@ -216,6 +217,15 @@ int main(int argc, char** argv){
             printf("\n");
         }
     }
+
+for (i=0; i<nVectores; i++){
+	printf("%s:  ",vectores[i].nombre);
+	printf("%s -> ",vectores[i].tipo);
+	for(j=vectores[i].nValores - 1; j>=0; j--){
+		printf("%s ", vectores[i].valor[j]);
+	}
+	printf("\n");
+}
 
     return 0;
 }
