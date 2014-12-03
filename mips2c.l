@@ -9,10 +9,9 @@ WORD {ALPHA}*
 
 "#"[^\n]*				  {/*printf("COMENTARIO<%s>",yytext);*/}
 ^"#"[^\n]*"\n"			  {/*printf("COMENTARIO DE LINEA<%s>",yytext);*/}
-"[ \t]+" 				  {/*printf("< >");*/}
-^"\n"					  {/*printf("\\n\n");*/}
+[ \t]+ 				  	  {/*printf("< >");*/}
 
-"\n"					  {/*printf("<eol>\n");*/return EOL;}
+\n					      {/*printf("<eol>\n");*/return EOL;}
 ":"						  {/*printf("<:>");*/return PP;}
 ","						  {/*printf("<,>");*/return C;}
 "("						  {/*printf("<(>");*/return P1;}
@@ -24,6 +23,7 @@ WORD {ALPHA}*
 "syscall" 				  {/*printf("<syscall>");*/yylval.valString = strdup(yytext);return SYSCALL;}
 
 {ALPHA}({ALPHA}|{DIGIT})* {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQ;}
+{ALPHA}({ALPHA}|{DIGIT})*":" {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQPP;}
 "$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/yylval.valString = strdup(yytext);return OPR;}
 "."("float"|"int")		  {/*printf("tipo<%s>",yytext);*/yylval.valString = strdup(yytext);return TIPO;}
 -?{DIGIT}+("."{DIGIT}+)?  {/*printf("valor<%s>",yytext);*/yylval.valString = strdup(yytext);return VALOR;}

@@ -42,7 +42,7 @@ int nBloques = 0;
 
 int nInstrucciones = 0;
 int nVectores = 0;
-
+int instruccionVacia = 0;
 void yyerror (char const * );
 
 %}
@@ -51,14 +51,12 @@ void yyerror (char const * );
 	char* valString;
 	struct Instruccion* valInstruccion;
 	struct Args* valArgs;
-	struct Bloque* valBloque;
 }
-%token DATA TEXT GLOBL SYSCALL PP C EOL P1 P2
-%token<valString> ETIQ OPR TIPO VALOR
+%token DATA TEXT GLOBL SYSCALL PP C EOL P1 P2 
+%token<valString> ETIQ OPR TIPO VALOR ETIQPP
 %type<valString> codigo text data definiciones definicion valores globl bloques instrucciones 
 %type<valInstruccion> instruccion
 %type<valArgs> operadores
-%type<valBloque> bloque
 %start S
 
 %%
@@ -75,9 +73,9 @@ data : DATA EOL definiciones 			{printf("-- seccion data\n");}
 definiciones : definicion 				{printf("-- definicion detectada\n");} 
 	| definicion definiciones 			{printf("-- queda mas definiciones\n");}
 ;
-definicion : ETIQ PP TIPO valores EOL 	{printf("-- definicion\n");
+definicion : ETIQPP TIPO valores EOL 	{printf("-- definicion\n");
 		   									vectores[nVectores].nombre = strdup($1);
-		   									vectores[nVectores].tipo = strdup($3);
+		   									vectores[nVectores].tipo = strdup($2);
 											nVectores++;
 		   								}
 ;
@@ -96,10 +94,7 @@ text : TEXT EOL globl    				{printf("-- seccion text\n");}
 ;
 globl : GLOBL ETIQ EOL bloques 			{printf("-- bloque inicial\n");}
 ;
-bloques : bloque 						{printf("-- bloque detectado\n");} 
-	| bloque bloques  					{printf("-- quedan mas bloques\n");}
-;
-bloque : ETIQ PP EOL instrucciones  	{printf("-- bloque de instrucciones\n");
+bloques : ETIQPP EOL instrucciones EOL  	{printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
 											bloque->etiqueta = strdup($1);
 
@@ -113,14 +108,35 @@ bloque : ETIQ PP EOL instrucciones  	{printf("-- bloque de instrucciones\n");
 											bloques[nBloques] = bloque;
 											nBloques++;
 	   									}
+	| bloques ETIQPP EOL instrucciones EOL {printf("-- bloque de instrucciones\n");
+	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
+											bloque->etiqueta = strdup($2);
+
+											int i;
+											for(i=0;i<nInstrucciones;i++)
+												bloque->instrucciones[i] = INST[i];
+
+											bloque->nInstrucciones = nInstrucciones;
+											nInstrucciones = 0; // para la siguiente?
+
+											bloques[nBloques] = bloque;
+											nBloques++;
+}
 ;
 instrucciones : instruccion				{printf("-- instruccion detectada\n");
-			  								INST[nInstrucciones] = $1;
-											nInstrucciones++;
+											if(!instruccionVacia){
+												INST[nInstrucciones] = $1;
+												nInstrucciones++;
+											}
+											instruccionVacia = 0;
+
 			  							} 
-	| instruccion instrucciones 		{printf("-- quedan mas instrucciones\n");
-											INST[nInstrucciones] = $1;
-											nInstrucciones++;
+	| instrucciones instruccion 		{printf("-- quedan mas instrucciones\n");
+											if(!instruccionVacia){
+												INST[nInstrucciones] = $2;
+												nInstrucciones++;
+											}
+											instruccionVacia = 0;
 										}
 ;
 instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
@@ -143,6 +159,7 @@ instruccion : ETIQ operadores EOL 		{printf("-- instruccion completa\n");
 
 											$$ = instruccion;
 										}
+	| EOL {printf("una insstruccion jodida %d\n",nInstrucciones);instruccionVacia=1;}
 ;
 operadores : OPR C OPR C OPR 			{printf("-- instruccion normal ");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
@@ -205,10 +222,10 @@ int main(int argc, char** argv){
 	yyparse();
 
     int i,j,k;
-    for (i=nBloques-1; i>=0; --i) {
+    for (i=0;i<nBloques;i++) {
         printf("%s\n",bloques[i]->etiqueta);
         printf("%d\n",bloques[i]->nInstrucciones);
-        for (j=bloques[i]->nInstrucciones-1;j>=0;--j) {
+        for (j=0;j<bloques[i]->nInstrucciones;j++) {
             printf("%s ",bloques[i]->instrucciones[j]->codigo);
             k = 0;
             while (k < 3 && bloques[i]->instrucciones[j]->args[k] != NULL) {
