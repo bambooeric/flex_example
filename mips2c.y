@@ -368,16 +368,40 @@ char* instructionToC(struct Instruccion* inst){
 
 	strcpy(buf,"\t");
 	if(strcmp(inst->codigo, "la")==0){
-		strcat(buf,"instruccion la");
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = (int) &");
+		strcat(buf,(inst->args[1]));
+	}else
+	if(strcmp(inst->codigo, "add")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," + ");
+		strcat(buf,++(inst->args[2]));
+	}else
+	if(strcmp(inst->codigo, "lw")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ((int*)");
+		strcat(buf,++(inst->args[2]));
+		strcat(buf,")[");
+		strcat(buf,inst->args[1]);
+		strcat(buf,"/4]");
+	}else
+	if(strcmp(inst->codigo, "addi")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," + ");
+		strcat(buf,inst->args[2]);
+	}else
+	if(strcmp(inst->codigo, "SYSCALL")==0){
+		strcat(buf,"if(v0==1) printf(\"\%d\\n\",a0)");
+	}else{
+		printf("DETECTADA INSTRUCCION NO IMPLEMENTADA. SALIENDO\n");
+		exit(1);
 	}
+
 	strcat(buf,";\n");
-
-	printf("\t%s ",inst->codigo);
-	int k = 0;
-	while (k < 3 && inst->args[k] != NULL) {
-		printf("%s ", inst->args[k++]);
-	}
-
 	return strdup(buf);
 }
 
@@ -394,12 +418,11 @@ char* blocksToFuctions(){
 
         for (j=0;j<bloques[i]->nInstrucciones;j++) {
 			strcat(buf,instructionToC(bloques[i]->instrucciones[j]));
-            printf("\n");
         }
 
 		// function tail
 
-		strcat(buf,"\n}\n\n");
+		strcat(buf,"}\n\n");
     }
 	return strdup(buf);
 }
@@ -409,14 +432,11 @@ int main(int argc, char** argv){
 	yyparse();
 	printASMCode();
 
-	printf("\n\nC CODE\n");
-	printf("%s\n",cHeaders());
-	printf("%s\n",asmDataToC());
-	printf("%s\n",registerDeclarations());
-	printf("%s\n",cFuncHeaders());
-	printf("%s\n",cMain());
-	printf("%s\n",blocksToFuctions());
+   	FILE *fp;
 
+   	fp = fopen("output.c", "w");
+    fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",cHeaders(),asmDataToC(),registerDeclarations(),cFuncHeaders(),cMain(),blocksToFuctions());
+	fclose(fp);
     return 0;
 }
 void yyerror (char const *message) {
