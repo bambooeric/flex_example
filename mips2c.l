@@ -23,9 +23,9 @@ WORD {ALPHA}*
 "syscall" 				  {/*printf("<syscall>");*/yylval.valString = strdup(yytext);return SYSCALL;}
 
 {ALPHA}({ALPHA}|{DIGIT})* {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQ;}
-{ALPHA}({ALPHA}|{DIGIT})*":" {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQPP;}
+{ALPHA}({ALPHA}|{DIGIT})*":" {yylval.valString = strdup(yytext);yylval.valString[strlen(yylval.valString)-1] = 0;return ETIQPP;}
 "$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/yylval.valString = strdup(yytext);return OPR;}
-"."("float"|"int")		  {/*printf("tipo<%s>",yytext);*/yylval.valString = strdup(yytext);return TIPO;}
+"."("float"|"int")		  {char* _s = strdup(yytext);_s++;yylval.valString = _s;return TIPO;}
 -?{DIGIT}+("."{DIGIT}+)?  {/*printf("valor<%s>",yytext);*/yylval.valString = strdup(yytext);return VALOR;}
 
 %%

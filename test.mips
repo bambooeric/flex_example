@@ -7,6 +7,18 @@ main:
 	lw $a2, 0($a0)
 	add $a1, $0, $a2
 
+
+	lw $a2, 4($a0)
+	add $a1, $a1, $a2
+
+	lw $a2, 8($a0)
+	add $a1, $a1, $a2
+
+
+	lw $a2, 12($a0)
+	add $a1, $a1, $a2
+
+
 	add $a0, $0, $a1
 	addi $v0, $0, 1
 	syscall
