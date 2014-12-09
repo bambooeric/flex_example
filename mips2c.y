@@ -333,6 +333,7 @@ char* registerDeclarations(){
 						dec_len++;
 					}
 				}
+				free(inst);
             }
         }
     }
@@ -404,6 +405,7 @@ char* instructionToC(struct Instruccion* _inst){
 	}
 
 	strcat(buf,";\n");
+	free(inst);
 	return strdup(buf);
 }
 
@@ -429,6 +431,33 @@ char* blocksToFuctions(){
 	return strdup(buf);
 }
 
+void freeStructures(){
+    int i,j,k;
+    for (i=0;i<nBloques;i++) {
+        for (j=0;j<bloques[i]->nInstrucciones;j++) {
+            free(bloques[i]->instrucciones[j]->codigo);
+            k = 0;
+            while (k < 3 && bloques[i]->instrucciones[j]->args[k] != NULL) {
+                free( bloques[i]->instrucciones[j]->args[k++]);
+            }
+
+        }
+		free(bloques[i]->instrucciones[j]);
+		free(bloques[i]->etiqueta);
+		free(bloques[i]);
+    }
+
+	for (i=0; i<nVectores; i++){
+		free(vectores[i].nombre);
+		free(vectores[i].tipo);
+		for(j=vectores[i].nValores - 1; j>=0; j--){
+			free(vectores[i].valor[j]);
+		}
+	}
+
+
+}
+
 int main(int argc, char** argv){
 	
 	yyparse();
@@ -437,8 +466,25 @@ int main(int argc, char** argv){
    	FILE *fp;
 
    	fp = fopen("output.c", "w");
-    fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",cHeaders(),asmDataToC(),registerDeclarations(),cFuncHeaders(),cMain(),blocksToFuctions());
+	char* b1 = cHeaders();
+	char* b2 = asmDataToC();
+	char* b3 = registerDeclarations();
+	char* b4 = cFuncHeaders();
+	char* b5 = cMain();
+	char* b6 = blocksToFuctions();
+
+    fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",b1,b2,b3,b4,b5,b6);
+
+	free(b1);
+	free(b2);
+	free(b3);
+	free(b4);
+	free(b5);
+	free(b6);
 	fclose(fp);
+
+	freeStructures();
+
     return 0;
 }
 void yyerror (char const *message) {
