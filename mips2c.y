@@ -363,8 +363,10 @@ char* cMain(){
 
 	return strdup(buf);
 }
-char* instructionToC(struct Instruccion* inst){
+char* instructionToC(struct Instruccion* _inst){
 	char buf[255];
+	struct Instruccion* inst = (struct Instruccion*) malloc(sizeof(struct Instruccion));
+	memcpy(inst,_inst,sizeof(struct Instruccion));
 
 	strcpy(buf,"\t");
 	if(strcmp(inst->codigo, "la")==0){
