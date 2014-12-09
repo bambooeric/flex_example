@@ -81,16 +81,21 @@ definicion : ETIQPP TIPO valores EOL 	{//printf("-- definicion\n");
 		   									vectores[nVectores].nombre = strdup($1);
 		   									vectores[nVectores].tipo = strdup($2);
 											nVectores++;
+											
+											free($1);
+											free($2);
 		   								}
 ;
 valores : VALOR 						{
 											int nValores = vectores[nVectores].nValores;
 											vectores[nVectores].valor[nValores] = strdup($1);
+											free($1);
 											vectores[nVectores].nValores++;
 										}
 	| VALOR C valores 					{
 											int nValores = vectores[nVectores].nValores;
 											vectores[nVectores].valor[nValores] = strdup($1);
+											free($1);
 											vectores[nVectores].nValores++;
 										}
 ;
@@ -98,11 +103,13 @@ text : TEXT EOL globl    				{/*printf("-- seccion text\n");*/}
 ;
 globl : GLOBL ETIQ EOL bloques 			{/*printf("-- bloque inicial\n");*/
 	  										bloqueInicial = strdup($2);
+											free($2);
 										}
 ;
 bloques : ETIQPP EOL instrucciones EOL  {//printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
 											bloque->etiqueta = strdup($1);
+											free($1);
 
 											int i;
 											for(i=0;i<nInstrucciones;i++)
@@ -117,6 +124,7 @@ bloques : ETIQPP EOL instrucciones EOL  {//printf("-- bloque de instrucciones\n"
 	| bloques ETIQPP EOL instrucciones EOL {//printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
 											bloque->etiqueta = strdup($2);
+											free($2);
 
 											int i;
 											for(i=0;i<nInstrucciones;i++)
@@ -153,6 +161,12 @@ instruccion : ETIQ operadores EOL 		{//printf("-- instruccion completa\n");
 											if($2->args[1]!=NULL) instruccion->args[1] = strdup($2->args[1]);
 											if($2->args[2]!=NULL) instruccion->args[2] = strdup($2->args[2]);
 
+											free($2->args[0]);
+											free($2->args[1]);
+											free($2->args[2]);
+											free($1);
+											free($2);
+											
 											$$ = instruccion;
 										}
 	| SYSCALL EOL 						{//printf("-- syscall invocado\n");
@@ -174,6 +188,10 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
 
+											free($1);
+											free($3);
+											free($5);
+
 											$$ = args;
 										} 		   
 	| OPR C OPR C VALOR 				{//printf("-- instruccion i\n");
@@ -182,6 +200,10 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[0] = strdup($1);
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
+
+											free($1);
+											free($3);
+											free($5);
 
 											$$ = args;
 										} 
@@ -192,6 +214,10 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
 
+											free($1);
+											free($3);
+											free($5);
+
 											$$ = args;
 										} 
 	| OPR C OPR C ETIQ	 				{//printf("-- instruccion salto cond\n");
@@ -201,6 +227,10 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[1] = strdup($3);
 											args->args[2] = strdup($5);
 
+											free($1);
+											free($3);
+											free($5);
+												
 											$$ = args;
 										} 
 	| ETIQ 								{//printf("-- instruccion salto\n");
@@ -209,6 +239,8 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[0] = strdup($1);
 											args->args[1] = NULL;
 											args->args[2] = NULL;
+
+											free($1);
 
 											$$ = args;
 										} 
@@ -219,6 +251,9 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 											args->args[1] = strdup($3);
 											args->args[2] = NULL;
 
+											free($1);
+											free($3);
+												
 											$$ = args;
 										} 
 ;
@@ -346,9 +381,11 @@ char* registerDeclarations(){
 	i=0;
 	foreach(char*, inst, declared, dec_len){
         strcat(buf, ++*inst);
+		free(--*inst);
 		i++;
 		if(i<dec_len) strcat(buf,", ");
 	}
+	free(declared);
 	strcat(buf,";\n");
 
 	return strdup(buf);
@@ -455,7 +492,7 @@ void freeStructures(){
 		}
 	}
 
-
+	free(bloqueInicial);
 }
 
 int main(int argc, char** argv){
@@ -463,25 +500,25 @@ int main(int argc, char** argv){
 	yyparse();
 	printASMCode();
 
-   	FILE *fp;
-
-   	fp = fopen("output.c", "w");
-	char* b1 = cHeaders();
+ 	char* b1 = cHeaders();
 	char* b2 = asmDataToC();
 	char* b3 = registerDeclarations();
 	char* b4 = cFuncHeaders();
 	char* b5 = cMain();
 	char* b6 = blocksToFuctions();
 
+	FILE *fp;
+   	fp = fopen("output.c", "w");
     fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",b1,b2,b3,b4,b5,b6);
+	fclose(fp);
 
+	// clean the room
 	free(b1);
 	free(b2);
 	free(b3);
 	free(b4);
 	free(b5);
 	free(b6);
-	fclose(fp);
 
 	freeStructures();
 
