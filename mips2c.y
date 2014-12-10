@@ -157,9 +157,9 @@ instruccion : ETIQ operadores EOL 		{//printf("-- instruccion completa\n");
 											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion));
 											instruccion->codigo = strdup($1);
 
-											if($2->args[0]!=NULL) instruccion->args[0] = strdup($2->args[0]);
-											if($2->args[1]!=NULL) instruccion->args[1] = strdup($2->args[1]);
-											if($2->args[2]!=NULL) instruccion->args[2] = strdup($2->args[2]);
+											if($2->args[0]!=NULL) instruccion->args[0] = strdup($2->args[0]); else instruccion->args[0] = NULL;
+											if($2->args[1]!=NULL) instruccion->args[1] = strdup($2->args[1]); else instruccion->args[1] = NULL;
+											if($2->args[2]!=NULL) instruccion->args[2] = strdup($2->args[2]); else instruccion->args[2] = NULL;
 
 											free($2->args[0]);
 											free($2->args[1]);
