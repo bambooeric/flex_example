@@ -434,10 +434,37 @@ char* instructionToC(struct Instruccion* _inst){
 		strcat(buf," + ");
 		strcat(buf,inst->args[2]);
 	}else
+	if(strcmp(inst->codigo, "slt")==0){
+		strcat(buf,"if(");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," < ");
+		strcat(buf,++(inst->args[2]));
+		strcat(buf,")\n\t\t");
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = 1;\n\telse\n\t\t");
+		strcat(buf,inst->args[0]);// aqui el puntero ya está desplazado
+		strcat(buf," = 0");
+	}else
+	if(strcmp(inst->codigo, "bne")==0){
+		strcat(buf,"if(");
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," != ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf,")\n\t\t_");
+		strcat(buf,inst->args[2]);
+		strcat(buf,"()");
+	}else
+	if(strcmp(inst->codigo, "j")==0){
+		strcat(buf,"_");
+		strcat(buf,inst->args[0]);
+		strcat(buf,"()");
+		printf("<%s>\n",buf);
+	}else
+
 	if(strcmp(inst->codigo, "SYSCALL")==0){
 		strcat(buf,"if(v0==1) printf(\"\%d\\n\",a0)");
 	}else{
-		printf("DETECTADA INSTRUCCION NO IMPLEMENTADA. SALIENDO\n");
+		printf("DETECTADA INSTRUCCION NO IMPLEMENTADA <%s>. SALIENDO\n",inst->codigo);
 		exit(1);
 	}
 
@@ -463,7 +490,7 @@ char* blocksToFuctions(){
 
 		// function tail
 
-		strcat(buf,"}\n\n");
+		strcat(buf,"\n\texit(0);\n}\n\n");
     }
 	return strdup(buf);
 }
@@ -491,6 +518,7 @@ void freeStructures(){
 			free(vectores[i].valor[j]);
 		}
 	}
+
 
 	free(bloqueInicial);
 }

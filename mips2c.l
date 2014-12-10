@@ -11,7 +11,7 @@ WORD {ALPHA}*
 ^"#"[^\n]*"\n"			  {/*printf("COMENTARIO DE LINEA<%s>",yytext);*/}
 [ \t]+ 				  	  {/*printf("< >");*/}
 
-\n					      {/*printf("<eol>\n");*/return EOL;}
+\n				      {/*printf("<eol>\n");*/return EOL;}
 ":"						  {/*printf("<:>");*/return PP;}
 ","						  {/*printf("<,>");*/return C;}
 "("						  {/*printf("<(>");*/return P1;}
@@ -24,8 +24,10 @@ WORD {ALPHA}*
 
 {ALPHA}({ALPHA}|{DIGIT})* {/*printf("etiq<%s>",yytext);*/yylval.valString = strdup(yytext);return ETIQ;}
 {ALPHA}({ALPHA}|{DIGIT})*":" {
-								yylval.valString = strdup(yytext);
-								yylval.valString[strlen(yylval.valString)-1] = 0;
+								char* _s = strdup(yytext);
+								_s[strlen(_s)-1] = 0;
+								yylval.valString = strdup(_s);
+								free(_s);
 								return ETIQPP;
 							}
 "$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/yylval.valString = strdup(yytext);return OPR;}
