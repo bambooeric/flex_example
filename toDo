@@ -1,0 +1,11 @@
+TIPO R
+	and
+	or
+	slt
+
+TIPO I
+	andi
+	ori
+	slti
+	sw
+	beq
