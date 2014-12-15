@@ -13,7 +13,7 @@ main:
 	slt $a4, $a2, $a3 # a4 if a2<a3
 	
 	# salto condicional >=
-	bne $a4, $0, menor # if 1!=2 salto 
+	bne $a4, $0, menor caca# if 1!=2 salto 
 
 	#hacer algo si es menor
 	j fin

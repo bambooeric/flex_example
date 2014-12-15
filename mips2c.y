@@ -85,38 +85,31 @@ definiciones : definicion 				{/*printf("-- definicion detectada\n");*/}
 	| definicion definiciones 			{/*printf("-- queda mas definiciones\n");*/}
 ;
 definicion : ETIQPP TIPO valores EOL 	{//printf("-- definicion\n");
-		   									vectores[nVectores].nombre = strdup($1);
-		   									vectores[nVectores].tipo = strdup($2);
+		   									vectores[nVectores].nombre = $1;
+		   									vectores[nVectores].tipo = $2;
 											nVectores++;
-											
-											free($1);
-											free($2);
 		   								}
 ;
 valores : VALOR 						{
 											int nValores = vectores[nVectores].nValores;
-											vectores[nVectores].valor[nValores] = strdup($1);
-											free($1);
+											vectores[nVectores].valor[nValores] = $1;
 											vectores[nVectores].nValores++;
 										}
 	| VALOR C valores 					{
 											int nValores = vectores[nVectores].nValores;
-											vectores[nVectores].valor[nValores] = strdup($1);
-											free($1);
+											vectores[nVectores].valor[nValores] = $1;
 											vectores[nVectores].nValores++;
 										}
 ;
 text : TEXT EOL globl    				{/*printf("-- seccion text\n");*/}
 ;
 globl : GLOBL ETIQ EOL bloques 			{/*printf("-- bloque inicial\n");*/
-	  										bloqueInicial = strdup($2);
-											free($2);
+	  										bloqueInicial = $2;
 										}
 ;
 bloques : ETIQPP EOL instrucciones EOL  {//printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
-											bloque->etiqueta = strdup($1);
-											free($1);
+											bloque->etiqueta = $1;
 
 											int i;
 											for(i=0;i<nInstrucciones;i++)
@@ -130,8 +123,7 @@ bloques : ETIQPP EOL instrucciones EOL  {//printf("-- bloque de instrucciones\n"
 	   									}
 	| bloques ETIQPP EOL instrucciones EOL {//printf("-- bloque de instrucciones\n");
 	   										struct Bloque* bloque = (struct Bloque*) malloc(sizeof(struct Bloque));
-											bloque->etiqueta = strdup($2);
-											free($2);
+											bloque->etiqueta = $2;
 
 											int i;
 											for(i=0;i<nInstrucciones;i++)
@@ -162,18 +154,12 @@ instrucciones : instruccion				{//printf("-- instruccion detectada\n");
 ;
 instruccion : ETIQ operadores EOL 		{//printf("-- instruccion completa\n");
 											struct Instruccion* instruccion = (struct Instruccion*) malloc(sizeof(struct Instruccion));
-											instruccion->codigo = strdup($1);
+											instruccion->codigo = $1;
 
-											if($2->args[0]!=NULL) instruccion->args[0] = strdup($2->args[0]); else instruccion->args[0] = NULL;
-											if($2->args[1]!=NULL) instruccion->args[1] = strdup($2->args[1]); else instruccion->args[1] = NULL;
-											if($2->args[2]!=NULL) instruccion->args[2] = strdup($2->args[2]); else instruccion->args[2] = NULL;
+											if($2->args[0]!=NULL) instruccion->args[0] = $2->args[0]; else instruccion->args[0] = NULL;
+											if($2->args[1]!=NULL) instruccion->args[1] = $2->args[1]; else instruccion->args[1] = NULL;
+											if($2->args[2]!=NULL) instruccion->args[2] = $2->args[2]; else instruccion->args[2] = NULL;
 
-											free($2->args[0]);
-											free($2->args[1]);
-											free($2->args[2]);
-											free($1);
-											free($2);
-											
 											$$ = instruccion;
 										}
 	| SYSCALL EOL 						{//printf("-- syscall invocado\n");
@@ -191,76 +177,56 @@ instruccion : ETIQ operadores EOL 		{//printf("-- instruccion completa\n");
 operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
-											args->args[1] = strdup($3);
-											args->args[2] = strdup($5);
-
-											free($1);
-											free($3);
-											free($5);
+											args->args[0] = $1;
+											args->args[1] = $3;
+											args->args[2] = $5;
 
 											$$ = args;
 										} 		   
 	| OPR C OPR C VALOR 				{//printf("-- instruccion i\n");
 											struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
-											args->args[1] = strdup($3);
-											args->args[2] = strdup($5);
-
-											free($1);
-											free($3);
-											free($5);
+											args->args[0] = $1;
+											args->args[1] = $3;
+											args->args[2] = $5;
 
 											$$ = args;
 										} 
 	| OPR C VALOR P1 OPR P2				{//printf("-- instruccion con desplazamiento\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
-											args->args[1] = strdup($3);
-											args->args[2] = strdup($5);
-
-											free($1);
-											free($3);
-											free($5);
+											args->args[0] = $1;
+											args->args[1] = $3;
+											args->args[2] = $5;
 
 											$$ = args;
 										} 
 	| OPR C OPR C ETIQ	 				{//printf("-- instruccion salto cond\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
-											args->args[1] = strdup($3);
-											args->args[2] = strdup($5);
+											args->args[0] = $1;
+											args->args[1] = $3;
+											args->args[2] = $5;
 
-											free($1);
-											free($3);
-											free($5);
-												
 											$$ = args;
 										} 
 	| ETIQ 								{//printf("-- instruccion salto\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
+											args->args[0] = $1;
 											args->args[1] = NULL;
 											args->args[2] = NULL;
 
-											free($1);
 
 											$$ = args;
 										} 
 	| OPR C ETIQ						{//printf("-- instruccion la\n");
 		   									struct Args* args = (struct Args*) malloc(sizeof(struct Args));
 
-											args->args[0] = strdup($1);
-											args->args[1] = strdup($3);
+											args->args[0] = $1;
+											args->args[1] = $3;
 											args->args[2] = NULL;
 
-											free($1);
-											free($3);
-												
 											$$ = args;
 										} 
 ;
@@ -408,7 +374,7 @@ char* cMain(){
 	return strdup(buf);
 }
 char* instructionToC(struct Instruccion* _inst){
-	char buf[255];
+	char buf[1023];
 	struct Instruccion* inst = (struct Instruccion*) malloc(sizeof(struct Instruccion));
 	memcpy(inst,_inst,sizeof(struct Instruccion));
 
@@ -511,7 +477,8 @@ void freeStructures(){
             }
 
         }
-		free(bloques[i]->instrucciones[j]);
+
+		//free(bloques[i]->instrucciones[j]);
 		free(bloques[i]->etiqueta);
 		free(bloques[i]);
     }
@@ -566,7 +533,6 @@ int main(int argc, char** argv){
 	free(b4);
 	free(b5);
 	free(b6);
-
 	freeStructures();
 
 	printf("\n>> DONE!\n");

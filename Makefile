@@ -13,5 +13,5 @@ run:
 	./$(FUENTE) < $(PRUEBA2)
 
 clean:
-	rm $(FUENTE) lex.yy.c $(FUENTE).tab.c $(FUENTE).tab.h
+	rm $(FUENTE) lex.yy.c $(FUENTE).tab.c $(FUENTE).tab.h *out $(FUENTE).output output.c
 
