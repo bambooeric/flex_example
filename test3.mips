@@ -1,35 +1,39 @@
 .text
 .globl main
 main:
-	# cargamos los vectores
 	la $a0, a
-	la $a1, b
+	la $a3, n
 
-	# cargamos el valor
-	lw $a2, 0($a0)
-	lw $a3, 0($a1)
-	
-	# comparamos
-	slt $a4, $a2, $a3 # a4 if a2<a3
-	
-	# salto condicional >=
-	bne $a4, $0, menor caca# if 1!=2 salto 
+	lw $a3, 0($a3)
 
-	#hacer algo si es menor
-	j fin
+	addi $a2, $0, 0
 
-menor:
-	# mostramos un 1
-	addi $a0, $0, 1	
+loop:
+	lw $a1, 0($a0)
+	addi $a1, $a1, 1
+	sw $a1, 0($a0)
+	addi $a0, $a0, 4
+	addi $a2, $a2, 1
+	bne $a3, $a2, loop
+
+print:
+	la $a4, a
 	addi $v0, $0, 1
+
+	lw $a0, 0($a4)
+	syscall
+	lw $a0, 4($a4)
+	syscall
+	lw $a0, 8($a4)
+	syscall
+	lw $a0, 12($a4)
 	syscall
 
-fin:
-	# mostramos un 0
-	addi $a0, $0, 0	
-	addi $v0, $0, 1
+end:
+	# exit
+	addi $v0, $0, 10
 	syscall
 
 .data
-	a: .int 3
-	b: .int 4
+	a: .int 1,2,3,4
+	n: .int 4

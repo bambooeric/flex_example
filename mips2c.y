@@ -367,12 +367,21 @@ char* cMain(){
 	char buf[2048];
 
 	strcpy(buf,"// Llamada al bloque inicial\n");
-	strcat(buf,"int main(){\n\t_");
+	strcat(buf,"int main(){\n\tgoto _");
 	strcat(buf,bloqueInicial);
-	strcat(buf,"();\n\treturn 0;\n}");
+	strcat(buf,";\n");
 
 	return strdup(buf);
 }
+
+char* cTail(){
+	char buf[64];
+
+	strcpy(buf,"\treturn 0;\n}\n");
+
+	return strdup(buf);
+}
+
 char* instructionToC(struct Instruccion* _inst){
 	char buf[1023];
 	struct Instruccion* inst = (struct Instruccion*) malloc(sizeof(struct Instruccion));
@@ -391,7 +400,21 @@ char* instructionToC(struct Instruccion* _inst){
 		strcat(buf," + ");
 		strcat(buf,++(inst->args[2]));
 	}else
-	if(strcmp(inst->codigo, "lw")==0){
+	if(strcmp(inst->codigo, "and")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," & ");
+		strcat(buf,++(inst->args[2]));
+	}else
+	if(strcmp(inst->codigo, "or")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," | ");
+		strcat(buf,++(inst->args[2]));
+	}else
+		if(strcmp(inst->codigo, "lw")==0){
 		strcat(buf,++(inst->args[0]));
 		strcat(buf," = ((int*)");
 		strcat(buf,++(inst->args[2]));
@@ -399,11 +422,34 @@ char* instructionToC(struct Instruccion* _inst){
 		strcat(buf,inst->args[1]);
 		strcat(buf,"/4]");
 	}else
+	if(strcmp(inst->codigo, "sw")==0){
+		strcat(buf,"((int*)");
+		strcat(buf,++(inst->args[2]));
+		strcat(buf,")[");
+		strcat(buf,inst->args[1]);
+		strcat(buf,"/4]");
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[0]));
+	}else
 	if(strcmp(inst->codigo, "addi")==0){
 		strcat(buf,++(inst->args[0]));
 		strcat(buf," = ");
 		strcat(buf,++(inst->args[1]));
 		strcat(buf," + ");
+		strcat(buf,inst->args[2]);
+	}else
+	if(strcmp(inst->codigo, "andi")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," & ");
+		strcat(buf,inst->args[2]);
+	}else
+	if(strcmp(inst->codigo, "ori")==0){
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," | ");
 		strcat(buf,inst->args[2]);
 	}else
 	if(strcmp(inst->codigo, "slt")==0){
@@ -417,23 +463,42 @@ char* instructionToC(struct Instruccion* _inst){
 		strcat(buf,inst->args[0]);// aqui el puntero ya está desplazado
 		strcat(buf," = 0");
 	}else
+	if(strcmp(inst->codigo, "slti")==0){
+		strcat(buf,"if(");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf," < ");
+		strcat(buf,inst->args[2]);
+		strcat(buf,")\n\t\t");
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," = 1;\n\telse\n\t\t");
+		strcat(buf,inst->args[0]);// aqui el puntero ya está desplazado
+		strcat(buf," = 0");
+	}else
 	if(strcmp(inst->codigo, "bne")==0){
 		strcat(buf,"if(");
 		strcat(buf,++(inst->args[0]));
 		strcat(buf," != ");
 		strcat(buf,++(inst->args[1]));
-		strcat(buf,")\n\t\t_");
+		strcat(buf,")\n\t\tgoto _");
 		strcat(buf,inst->args[2]);
-		strcat(buf,"()");
+	}else
+	if(strcmp(inst->codigo, "beq")==0){
+		strcat(buf,"if(");
+		strcat(buf,++(inst->args[0]));
+		strcat(buf," == ");
+		strcat(buf,++(inst->args[1]));
+		strcat(buf,")\n\t\tgoto _");
+		strcat(buf,inst->args[2]);
 	}else
 	if(strcmp(inst->codigo, "j")==0){
-		strcat(buf,"_");
+		strcat(buf,"goto _");
 		strcat(buf,inst->args[0]);
-		strcat(buf,"()");
 	}else
-
 	if(strcmp(inst->codigo, "SYSCALL")==0){
-		strcat(buf,"if(v0==1) printf(\"\%d\\n\",a0)");
+		strcat(buf,"switch (v0){\n");
+		strcat(buf,"\tcase 1:\n\t\tprintf(\"\%d\\n\",a0);\n\t\tbreak;\n");
+		strcat(buf,"\tcase 10:\n\t\texit(0);\n\t\tbreak;\n");
+		strcat(buf,"\tdefault:\n\t\tprintf(\"Syscall not implemented yet\\n\");\n\t\texit(1);\n\t}");
 	}else{
 		printf(">> UNIMPLEMENTED ASM FUNCTION <%s>. ABORTING\n",inst->codigo);
 		exit(1);
@@ -451,9 +516,9 @@ char* blocksToFuctions(){
     int i,j,k;
     for (i=0;i<nBloques;i++) {
 		// function header
-		strcat(buf,"void _");
+		strcat(buf,"_");
 		strcat(buf,bloques[i]->etiqueta);
-		strcat(buf,"(){\n");
+		strcat(buf,":\n");
 
         for (j=0;j<bloques[i]->nInstrucciones;j++) {
 			strcat(buf,instructionToC(bloques[i]->instrucciones[j]));
@@ -461,7 +526,7 @@ char* blocksToFuctions(){
 
 		// function tail
 
-		strcat(buf,"\n\texit(0);\n}\n\n");
+		strcat(buf,"\n\n");
     }
 	return strdup(buf);
 }
@@ -516,12 +581,12 @@ int main(int argc, char** argv){
 	char* b4 = cFuncHeaders();
 	char* b5 = cMain();
 	char* b6 = blocksToFuctions();
-
+	char* b7 = cTail();
 
 	printf("\n>> STEP 3: GENERATING C CODE...\n");
 	FILE *fp;
    	fp = fopen(OUTPUT_FILENAME, "w");
-    fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",b1,b2,b3,b4,b5,b6);
+    fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n%s\n",b1,b2,b3,b4,b5,b6,b7);
 	fclose(fp);
 	printf(">> Saved file as \"%s\"\n",OUTPUT_FILENAME);
 	printf("\n>> STEP 4: FINISHING...\n");
@@ -533,6 +598,7 @@ int main(int argc, char** argv){
 	free(b4);
 	free(b5);
 	free(b6);
+	free(b7);
 	freeStructures();
 
 	printf("\n>> DONE!\n");

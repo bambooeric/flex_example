@@ -15,8 +15,12 @@ main:
 	# salto condicional >=
 	bne $a4, $0, menor # if 1!=2 salto 
 
-	#hacer algo si es menor
-	j fin
+	# hacer algo si es menor
+	beq $a4, $0, fin
+
+	# syscall para terminar el programa
+	addi $v0, $0, 10
+	syscall
 
 menor:
 	# mostramos un 1
@@ -29,6 +33,7 @@ fin:
 	addi $a0, $0, 0	
 	addi $v0, $0, 1
 	syscall
+
 
 .data
 	a: .int 3
