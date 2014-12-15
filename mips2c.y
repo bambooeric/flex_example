@@ -1,15 +1,21 @@
-
 %error-verbose
+
 %{
+
 #include<stdlib.h>
 #include<stdio.h>
 #include<string.h>
+
 #define foreach( idxtype , idxpvar , col , colsiz ) idxtype* idxpvar; for( idxpvar=col ; idxpvar < (col+(colsiz)) ; idxpvar++)
 
-#define MAX_INSTRUCCIONES 100
+#define MAX_INSTRUCCIONES 300
 #define MAX_DATA_SIZE 100
 #define MAX_DATA_VARS 100
-#define MAX_BLOQUES 10
+#define MAX_BLOQUES 50
+#define OUTPUT_FILENAME "output.c"
+
+extern int yylineno;
+
 
 struct Args{
 	char* args[3];
@@ -47,6 +53,7 @@ char* bloqueInicial;
 int nInstrucciones = 0;
 int nVectores = 0;
 int instruccionVacia = 0;
+
 void yyerror (char const * );
 
 %}
@@ -260,7 +267,6 @@ operadores : OPR C OPR C OPR 			{//printf("-- instruccion normal ");
 %%
 
 void printASMCode(){
-	printf("Initial sec: <%s>\n",bloqueInicial);
     int i,j,k;
     for (i=0;i<nBloques;i++) {
         printf("%s",bloques[i]->etiqueta);
@@ -458,13 +464,12 @@ char* instructionToC(struct Instruccion* _inst){
 		strcat(buf,"_");
 		strcat(buf,inst->args[0]);
 		strcat(buf,"()");
-		printf("<%s>\n",buf);
 	}else
 
 	if(strcmp(inst->codigo, "SYSCALL")==0){
 		strcat(buf,"if(v0==1) printf(\"\%d\\n\",a0)");
 	}else{
-		printf("DETECTADA INSTRUCCION NO IMPLEMENTADA <%s>. SALIENDO\n",inst->codigo);
+		printf(">> UNIMPLEMENTED ASM FUNCTION <%s>. ABORTING\n",inst->codigo);
 		exit(1);
 	}
 
@@ -525,8 +530,18 @@ void freeStructures(){
 
 int main(int argc, char** argv){
 	
-	yyparse();
+	printf("\n>> STEP 1: PARSING SOURCE ASM CODE...\n");
+	if(yyparse()){
+		printf("Couldn`t parse file. Exiting...\n");
+	}
+
+	printf(">> done!\n");
+	printf(">> DETECTED ASM CODE:\n");
+
 	printASMCode();
+
+	printf("\n>> %d lines of ASM code successfully analyzed",yylineno-1);
+	printf("\n>> STEP 2: TRANSLATING C CODE...\n");
 
  	char* b1 = cHeaders();
 	char* b2 = asmDataToC();
@@ -535,10 +550,14 @@ int main(int argc, char** argv){
 	char* b5 = cMain();
 	char* b6 = blocksToFuctions();
 
+
+	printf("\n>> STEP 3: GENERATING C CODE...\n");
 	FILE *fp;
-   	fp = fopen("output.c", "w");
+   	fp = fopen(OUTPUT_FILENAME, "w");
     fprintf(fp, "%s\n%s\n%s\n%s\n%s\n%s\n",b1,b2,b3,b4,b5,b6);
 	fclose(fp);
+	printf(">> Saved file as \"%s\"\n",OUTPUT_FILENAME);
+	printf("\n>> STEP 4: FINISHING...\n");
 
 	// clean the room
 	free(b1);
@@ -550,8 +569,11 @@ int main(int argc, char** argv){
 
 	freeStructures();
 
+	printf("\n>> DONE!\n");
     return 0;
 }
+
 void yyerror (char const *message) {
-	fprintf(stderr, "%s\n",message);
+	fprintf(stderr, ">> %s near line %d\n>> Couldn`t parse file. Exiting...\n",message, yylineno);
+	exit(1);
 }

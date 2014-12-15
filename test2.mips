@@ -13,21 +13,22 @@ main:
 	slt $a4, $a2, $a3 # a4 if a2<a3
 	
 	# salto condicional >=
-	bne $a4, $0, menor # if 1!=2 salto 
+	bne $a4, $0, menor caca# if 1!=2 salto 
 
 	#hacer algo si es menor
-#	j fin
+	j fin
 
 menor:
 	# mostramos un 1
 	addi $a0, $0, 1	
 	addi $v0, $0, 1
 	syscall
-#fin:
-#	# mostramos un 0
-#	addi $a0, $0, 1	
-#	addi $v0, $0, 1
-#	syscall
+
+fin:
+	# mostramos un 0
+	addi $a0, $0, 0	
+	addi $v0, $0, 1
+	syscall
 
 .data
 	a: .int 3

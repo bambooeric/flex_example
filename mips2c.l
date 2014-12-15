@@ -1,17 +1,23 @@
+%option yylineno
+
 %{
+
 #include<stdlib.h>
 #include "mips2c.tab.h"
+
 %}
+
 DIGIT [0-9]
 ALPHA [A-Za-z]
 WORD {ALPHA}*
+
 %%
 
 "#"[^\n]*				  {/*printf("COMENTARIO<%s>",yytext);*/}
 ^"#"[^\n]*"\n"			  {/*printf("COMENTARIO DE LINEA<%s>",yytext);*/}
 [ \t]+ 				  	  {/*printf("< >");*/}
 
-\n				      {/*printf("<eol>\n");*/return EOL;}
+\n					      {/*printf("<eol>\n");*/return EOL;}
 ":"						  {/*printf("<:>");*/return PP;}
 ","						  {/*printf("<,>");*/return C;}
 "("						  {/*printf("<(>");*/return P1;}
@@ -29,7 +35,7 @@ WORD {ALPHA}*
 								yylval.valString = strdup(_s);
 								free(_s);
 								return ETIQPP;
-							}
+						  }
 "$"{ALPHA}?{DIGIT}*		  {/*printf("opr<%s>",yytext);*/yylval.valString = strdup(yytext);return OPR;}
 "."("float"|"int")		  {
 								char* _s = strdup(yytext);
@@ -37,7 +43,7 @@ WORD {ALPHA}*
 								yylval.valString = strdup(_s);
 								free(--_s);
 								return TIPO;
-							}
+						  }
 -?{DIGIT}+("."{DIGIT}+)?  {/*printf("valor<%s>",yytext);*/yylval.valString = strdup(yytext);return VALOR;}
 
 %%
