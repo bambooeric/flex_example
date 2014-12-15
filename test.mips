@@ -23,6 +23,9 @@ main:
 	addi $v0, $0, 1
 	syscall
 
+	addi $v0, $0, 10
+	syscall
+
 etiqueta2:
 	add $a2, $a2, $a2
 
